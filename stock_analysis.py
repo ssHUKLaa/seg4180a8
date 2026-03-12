@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Example:
+    python stock_analysis.py --symbol AAPL --period 5y --freq D --lags 5 --test-size 0.2
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -89,8 +94,6 @@ def download_prices(symbol: str, period: str) -> pd.Series:
     else:
         raise ValueError("Could not find 'Adj Close' or 'Close' in downloaded data.")
 
-    # yfinance can return a single-column DataFrame (e.g., with MultiIndex columns).
-    # Convert that case to a Series so downstream logic is consistent.
     if isinstance(prices, pd.DataFrame):
         if prices.shape[1] != 1:
             raise ValueError(
@@ -113,7 +116,6 @@ def preprocess_returns(prices: pd.Series, freq: str) -> pd.Series:
     rule = FREQ_MAP[freq]
     prices_resampled = prices.resample(rule).last()
 
-    # Fill occasional missing points after resampling, then compute returns.
     prices_resampled = prices_resampled.ffill().dropna()
     returns = prices_resampled.pct_change().dropna()
     if isinstance(returns, pd.DataFrame):
@@ -192,12 +194,11 @@ def evaluate_model_and_metrics(
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     mae = mean_absolute_error(y_test, y_pred)
 
-    # Buy-and-hold metrics on unseen test returns.
     annual_return_buy_hold = annualized_return_from_periodic(y_test, periods_per_year)
     sharpe_buy_hold = safe_sharpe_ratio(y_test, periods_per_year)
     sortino_buy_hold = safe_sortino_ratio(y_test, periods_per_year)
 
-    # Simple model strategy: long if predicted return > 0, else cash.
+
     strategy_returns = y_test.where(y_pred > 0.0, 0.0)
     annual_return_strategy = annualized_return_from_periodic(strategy_returns, periods_per_year)
     sharpe_strategy = safe_sharpe_ratio(strategy_returns, periods_per_year)
