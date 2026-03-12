@@ -1,0 +1,12 @@
+metric,value
+n_observations_total,1303.0
+n_train,1038.0
+n_test,260.0
+rmse,0.019747412248961746
+mae,0.011956032405287883
+annual_return_buy_hold,0.21745123611023032
+sharpe_buy_hold,0.7852098939571276
+sortino_buy_hold,1.0630863238006343
+annual_return_strategy,0.1425261469032797
+sharpe_strategy,0.6418452908883068
+sortino_strategy,0.8971483427509767
